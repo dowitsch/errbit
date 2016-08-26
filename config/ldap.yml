@@ -1,0 +1,8 @@
+host: <%= ENV["LDAP_HOST"] %>
+port: 636
+attribute: uid
+base: <%= ENV["LDAP_BASE"] %>
+#admin_user: <%= ENV["LDAP_USER"] %>
+#admin_password: <%= ENV["LDAP_PASSWORD"] %
+ssl: true
+<<: *AUTHORIZATIONS
