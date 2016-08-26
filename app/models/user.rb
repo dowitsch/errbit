@@ -47,12 +47,10 @@ class User
     validates :username, presence: true
   end
 
-  if Errbit::Config.use_ldap_auth
-    before_save :set_ldap_email
-    def set_ldap_email
-      self.email = Devise::LdapAdapter.get_ldap_param(self.username, "mail").first
-      self.name = "#{Devise::LdapAdapter.get_ldap_param(self.username, "givenName").first} #{Devise::LdapAdapter.get_ldap_param(self.username, "sn").first}"
-    end
+  before_save :set_ldap_email
+  def set_ldap_email
+    self.email = Devise::LdapAdapter.get_ldap_param(self.username, "mail").first
+    self.name = "#{Devise::LdapAdapter.get_ldap_param(self.username, "givenName").first} #{Devise::LdapAdapter.get_ldap_param(self.username, "sn").first}"
   end
 
 
@@ -102,6 +100,15 @@ class User
     self.class.validators_on(:password).map { |v| v.validate_each(self, :password, password) }
     return false if errors.any?
     save(validate: false)
+  end
+
+  def ldap_before_save
+    name = Devise::LDAP::Adapter.get_ldap_param(self.username, "givenName")
+    surname = Devise::LDAP::Adapter.get_ldap_param(self.username, "sn")
+    mail = Devise::LDAP::Adapter.get_ldap_param(self.username, "mail")
+
+    self.name = (name + surname).join ' '
+    self.email = mail.first
   end
 
   private def generate_authentication_token
