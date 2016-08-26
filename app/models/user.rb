@@ -42,10 +42,19 @@ class User
   validates :name, presence: true
   validates :github_login, uniqueness: { allow_nil: true }
 
-  if Errbit::Config.user_has_username
+  if Errbit::Config.user_has_username || Errbit::Config.use_ldap_auth
     field :username
     validates :username, presence: true
   end
+
+  if Errbit::Config.use_ldap_auth
+    before_save :set_ldap_email
+    def set_ldap_email
+      self.email = Devise::LdapAdapter.get_ldap_param(self.username, "mail").first
+      self.name = "#{Devise::LdapAdapter.get_ldap_param(self.username, "givenName").first} #{Devise::LdapAdapter.get_ldap_param(self.username, "sn").first}"
+    end
+  end
+
 
   def per_page
     super || PER_PAGE

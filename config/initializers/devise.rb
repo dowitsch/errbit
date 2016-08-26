@@ -5,7 +5,16 @@ Devise.setup do |config|
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
   # config.secret_key = '2970917daf24e79762e7f370c2121b17417d729bdc587874c769b298a580824ff79b4cfd8ad6f3da94c6bbd1d5e12b483dbd2fd78b343777adc1fd15692dbcb2'
-
+  # ==> LDAP Configuration 
+  config.ldap_logger = false
+  config.ldap_create_user = true
+  config.ldap_update_password = false
+  # config.ldap_config = "#{Rails.root}/config/ldap.yml"
+  config.ldap_check_group_membership = false
+  # config.ldap_check_attributes = false
+  # config.ldap_use_admin_to_bind = false
+  # config.ldap_ad_group_check = false
+   
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
@@ -29,7 +38,7 @@ Devise.setup do |config|
   # session. If you need permissions, you should implement that in a before filter.
   # You can also supply a hash where the value is a boolean determining whether
   # or not authentication should be aborted when the value is not present.
-  config.authentication_keys = [Errbit::Config.user_has_username ? :username : :email]
+  config.authentication_keys = [ (Errbit::Config.user_has_username || Errbit::Config.use_ldap_auth) ? :username : :email ]
 
   # Configure parameters from the request object used for authentication. Each entry
   # given should be a request method and it will automatically be passed to the
